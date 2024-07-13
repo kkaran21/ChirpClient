@@ -7,7 +7,7 @@ function RegisterPage() {
     const [password, setPassword] = useState("");
     const [open, setOpen] = useState(false);
     const [severity, setSeverity] = useState<"success" | "error" | "info" | "warning">("success");
-    const [message, setMessage] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
 
     const handleClose = () => {
         setOpen(false);
@@ -27,19 +27,19 @@ function RegisterPage() {
             if (response.status == 201) {
                 setOpen(true)
                 setSeverity("success")
-                setMessage("You are successflly registered")
+                setToastMessage("You are successflly registered")
 
             }
             else {
                 setOpen(true)
                 setSeverity("error")
-                setMessage("Please try again")
+                setToastMessage("Please try again")
 
             }
         } catch (error) {
             setOpen(true)
             setSeverity("error")
-            setMessage("error occured in application")
+            setToastMessage("error occured in application")
         }
 
     }
@@ -52,7 +52,7 @@ function RegisterPage() {
                 <Typography component="h1" variant="h5">
                     Sign Up
                 </Typography>
-                <Box component="form" noValidate sx={{ mt: 1 }}>
+                <Box  sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
@@ -101,7 +101,7 @@ function RegisterPage() {
             <SnackbarComponent  open={open}
                 onClose={handleClose}
                 severity={severity}
-                message={message}/>
+                message={toastMessage}/>
         </Grid>
     </>
 }

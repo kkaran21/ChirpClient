@@ -2,68 +2,76 @@ import { Grid, Typography, Box, TextField, Button, Link } from "@mui/material";
 import { useState } from "react";
 import SnackbarComponent from "../Components/SnackbarComponent";
 import { setCookie } from "../Utils/CookieUtils";
+import { useNavigate } from "react-router-dom";
 
- function LoginPage()
-{
+function LoginPage() {
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [open, setOpen] = useState(false);
-    const [severity, setSeverity] = useState<"success" | "error" | "info" | "warning">("success");
-    const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false);
+  const [severity, setSeverity] = useState<"success" | "error" | "info" | "warning">("success");
+  const [toastMessage, setToastMessage] = useState("");
+  const navigate = useNavigate();
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    async function Login() {
+  async function Login() {
 
-        try {
-            const response = await fetch("http://127.0.0.1:8000/Login", {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                method: "POST",
-                body: JSON.stringify({ email: email, password: password }),
-            });
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-            const responseBody = await response.json();
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("username", email);
+      urlencoded.append("password", password);
 
-            if (response.status == 200) {
-                setOpen(true)
-                setSeverity("success")
-                setMessage("Redirecting You to Home Page!")
-                setCookie('authToken',responseBody.access_token)                   
-            }
-            else if(response.status == 403){
-                setOpen(true)
-                setSeverity("error")
-                setMessage(responseBody.detail)
-            }
-            else {
-                setOpen(true)
-                setSeverity("error")
-                setMessage("Please try again") 
-            }
-        } catch (error) {
-            setOpen(true)
-            setSeverity("error")
-            setMessage("error occured in application")
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        headers: myHeaders,
+        method: "POST",
+        body: urlencoded,
+        redirect: "follow"
+      });
 
-        }
+      const responseBody = await response.json();
+
+      if (response.status == 200) {
+        setOpen(true)
+        setSeverity("success")
+        setToastMessage("Redirecting You to Home Page!")
+        setCookie('authToken', responseBody.access_token)
+        navigate('/home')
+      }
+      else if (response.status == 403) {
+        setOpen(true)
+        setSeverity("error")
+        setToastMessage(responseBody.detail)
+      }
+      else {
+        setOpen(true)
+        setSeverity("error")
+        setToastMessage("Please try again")
+      }
+    } catch (error) {
+      setOpen(true)
+      setSeverity("error")
+      setToastMessage("error occured in application")
 
     }
-    
-   return <>
-   <Grid container spacing={0.5}>
-    <Grid item xs={6}>
-      <h1>left</h1>
-    </Grid>
-    <Grid item xs={6}>
-    <Typography component="h1" variant="h5">
-    Sign in
-  </Typography>
-  <Box component="form" noValidate  sx={{ mt: 1 }}>
+
+  }
+
+  return <>
+    <Grid container spacing={0.5}>
+      <Grid item xs={6}>
+        <h1>left</h1>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <Box sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
@@ -73,6 +81,8 @@ import { setCookie } from "../Utils/CookieUtils";
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={(e) => setEmail(e.target.value)}
+
           />
           <TextField
             margin="normal"
@@ -83,6 +93,8 @@ import { setCookie } from "../Utils/CookieUtils";
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
+
           />
           <Button
             type="submit"
@@ -106,13 +118,13 @@ import { setCookie } from "../Utils/CookieUtils";
             </Grid>
           </Grid>
         </Box>
+      </Grid>
+      <SnackbarComponent open={open}
+        onClose={handleClose}
+        severity={severity}
+        message={toastMessage} />
     </Grid>
-    <SnackbarComponent  open={open}
-                onClose={handleClose}
-                severity={severity}
-                message={message}/>
-    </Grid>
-   </> 
+  </>
 }
 
 export default LoginPage

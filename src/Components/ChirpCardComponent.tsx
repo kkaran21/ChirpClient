@@ -1,6 +1,5 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, Avatar, IconButton, Typography, CardActions } from '@mui/material';
-import { Favorite, Share, MoreVert, FavoriteOutlined } from '@mui/icons-material';
+import { Share, MoreVert, FavoriteOutlined } from '@mui/icons-material';
 interface User {
     name: string;
     username: string;
@@ -8,6 +7,7 @@ interface User {
   }
   
   interface Tweet {
+    title:string
     content: string;
   }
   
@@ -35,7 +35,7 @@ const ChirpCardComponent = ({ user , tweet  }: Props) => {
       />
       <CardContent>
       <Typography variant="h6" color="textSecondary" component="p" sx={{ fontWeight: 'bold' }}>
-        static title
+        {tweet.title}
         </Typography>
         <Typography variant="body2" color="textSecondary" component="p">
           {tweet.content}
